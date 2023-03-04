@@ -1,0 +1,6 @@
+# This was made using a tutorial: https://www.youtube.com/watch?v=U34l-Xz5ynU&t=342s
+
+# Things I changed
+ (1) i made variables for the canvas size so they would reference each other to be the same dimensions
+
+# Notes
