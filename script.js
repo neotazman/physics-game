@@ -16,39 +16,44 @@ window.addEventListener('load', () => { // I don't see the point of this yet
     canvas.width = canvasWidth
 
     ctx.fillStyle = 'white'
+    ctx.lineWidth = 3
+    ctx.strokeStyle = 'white'
 
-    class Player {
-        constructor(game) {
-            this.game = game
-            this.collisionX = this.game.width * 0.5
-            this.collisionY = this.game.height * 0.5
-            this.collionRadius = 50
-        }
-        draw(context) {
-            context.beginPath()
-            context.arc(this.collisionX, this.collisionY, this.collionRadius, 0, Math.PI * 2)
-            context.fill()
-        }
-    }
+    // class Player { // i put the classes in a separate file 
+    //     constructor(game) {
+    //         this.game = game
+    //         this.collisionX = this.game.width * 0.5
+    //         this.collisionY = this.game.height * 0.5
+    //         this.collisionRadius = 50
+    //     }
+    //     draw(context) {
+    //         context.beginPath()
+    //         context.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2)
+    //         context.fill()
+    //     }
+    // }
 
-    class Game {
-        constructor(canvas) {
-            this.canvas = canvas
-            this.width = this.canvas.width
-            this.height = this.canvas.height
-            this.player = new Player(this)
-        }
-        render(context) {
-            this.player.draw(context)
-        }
-    }
+    // class Game {
+    //     constructor(canvas) {
+    //         this.canvas = canvas
+    //         this.width = this.canvas.width
+    //         this.height = this.canvas.height
+    //         this.player = new Player(this) // instantiating the player, later might be useful to put somewhere else instead/in addition to
+    //     }
+    //     render(context) {
+    //         this.player.draw(context)
+    //     }
+    // }
 
     const game = new Game(canvas)
-    game.render(ctx)
+    
     console.log(game)
 
     function animate() {
-
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        game.render(ctx)
+        requestAnimationFrame(animate)
     }
+    animate()
 })
 
