@@ -57,9 +57,11 @@ class Obstacle {
         this.height = this.spriteHeight
         this.spriteX = this.collisionX - this.width / 2
         this.spriteY = this.collisionY - this.height / 2 - 70
+        this.frameX = Math.floor(Math.random() * 4)
+        this.frameY = Math.floor(Math.random() * 3)
     }
     draw(context) {
-        context.drawImage(this.image, 0, 0, this.spriteWidth, this.spriteHeight, this.spriteX, this.spriteY, this.width, this.height)
+        context.drawImage(this.image, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, this.spriteX, this.spriteY, this.width, this.height)
         context.beginPath()
         context.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2)
         // .save() and .restore() are if i want to change a state's settings for what's between them and have it not affect the rest of the code
@@ -76,6 +78,7 @@ class Game {
         this.canvas = canvas
         this.width = this.canvas.width
         this.height = this.canvas.height
+        this.topMargin = 260
         this.player = new Player(this) // instantiating the player, later might be useful to put somewhere else instead/in addition to
         this.numberOfObstacles = 10 // Math.ceil(Math.random() * 6)
         this.obstacles = []
@@ -119,12 +122,14 @@ class Game {
                 const dx = testObstacle.collisionX - obstacle.collisionX
                 const dy = testObstacle.collisionY - obstacle.collisionY
                 const distance = Math.hypot(dy, dx)
-                const sumOfRadii = testObstacle.collisionRadius + obstacle.collisionRadius
+                const distanceBuffer = 150 // the distance between the obstacles
+                const sumOfRadii = testObstacle.collisionRadius + obstacle.collisionRadius + distanceBuffer
                 if(distance < sumOfRadii) {
                     overlap = true
                 }
             })
-            if(!overlap) {
+            const margin = testObstacle.collisionRadius * 2
+            if(!overlap && testObstacle.spriteX > 0 && testObstacle.spriteX < this.width - testObstacle.width && testObstacle.collisionY > this.topMargin + margin && testObstacle.collisionY < this.height - margin) { // makes sure the obstacles don't overlap or move past the edges of the page
                 this.obstacles.push(testObstacle)
             }
             attempts++

@@ -2,7 +2,7 @@
 
 # Things I changed
 
- 1) i made variables for the canvas size so they would reference each other to be the same dimensions
+ 1) i made variables for the canvas size so they would reference each other to be the same dimensions -- i don't think this is gonna matter anymore except for making the overlay and the canvas the same size
     a) also i made sure the overlay had the same dimensions as the canvas
 
 2) i put the classes in a separate file
@@ -10,3 +10,5 @@
 3) i used Math.ceil(Math.random()) to choose number of starting obstacles
 
 # Notes
+
+! 3/7/2023 48:28 in the video

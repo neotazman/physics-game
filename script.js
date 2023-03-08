@@ -1,6 +1,6 @@
 // this was made using a tutorial: https://www.youtube.com/watch?v=U34l-Xz5ynU&t=342s
 
-// using exact pixels doesn't work well with zooming in, so i'm using a variable that I can change if i need to
+// using exact pixels doesn't work well with zooming in, so i'm using a variable that both the canvas and the overlay will be set to
 // might change to percentage in css
 let canvasHeight = 720
 let canvasWidth = canvasHeight * (1280 / 720)
