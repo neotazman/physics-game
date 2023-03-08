@@ -7,4 +7,6 @@
 
 2) i put the classes in a separate file
 
+3) i used Math.ceil(Math.random()) to choose number of starting obstacles
+
 # Notes
