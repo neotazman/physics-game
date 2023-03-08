@@ -10,6 +10,7 @@ class Player {
         this.speedY = 0
         this.dx = 0
         this.dy = 0
+        this.speedModifier = 15
     }
     draw(context) {
         context.beginPath()
@@ -29,10 +30,36 @@ class Player {
     update() {
         this.dx = this.game.mouse.x - this.collisionX
         this.dy = this.game.mouse.y - this.collisionY
-        this.speedX = this.dx / 30
-        this.speedY = this.dy / 20
-        this.collisionX += this.speedX
-        this.collisionY += this.speedY
+        const distance = Math.hypot(this.dy, this.dx)
+        if(distance > this.speedModifier) { // so the player doesn't keep shaking when it hits the clicked spot
+            this.speedX = this.dx / distance || 0
+            this.speedY = this.dy / distance || 0            
+        } else {
+            this.speedX = 0
+            this.speedY = 0
+        }
+
+        this.collisionX += this.speedX * this.speedModifier
+        this.collisionY += this.speedY * this.speedModifier
+    }
+}
+
+class Obstacle {
+    constructor(game) {
+        this.game = game
+        this.collisionX = Math.random() * this.game.width
+        this.collisionY = Math.random() * this.game.height
+        this.collisionRadius = 50
+    }
+    draw(context) {
+        context.beginPath()
+        context.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2)
+        // .save() and .restore() are if i want to change a state's settings for what's between them and have it not affect the rest of the code
+        context.save() // context.save() creates a snapshot of the current canvas state
+        context.globalAlpha = 0.5
+        context.fill()
+        context.restore() // restores what was saved
+        context.stroke()
     }
 }
 
@@ -42,6 +69,8 @@ class Game {
         this.width = this.canvas.width
         this.height = this.canvas.height
         this.player = new Player(this) // instantiating the player, later might be useful to put somewhere else instead/in addition to
+        this.numberOfObstacles = Math.ceil(Math.random() * 6)
+        this.obstacles = []
         this.mouse = {
             x: this.canvas.width * 0.5,
             y: this.canvas.height * 0.5,
@@ -49,6 +78,7 @@ class Game {
         }
         // the overlay is changed in the css file to make these work more reliably
         canvas.addEventListener('mousedown', (e) => { 
+            console.log(this.player)
             this.mouse.x = e.offsetX
             this.mouse.y = e.offsetY
             this.mouse.isPressed = true
@@ -68,5 +98,11 @@ class Game {
     render(context) {
         this.player.draw(context)
         this.player.update()
+        this.obstacles.forEach(obstacle => obstacle.draw(context))
+    }
+    init() {
+        for(let i = 0; i < this.numberOfObstacles; i++) {
+            this.obstacles.push(new Obstacle(this))
+        }
     }
 }

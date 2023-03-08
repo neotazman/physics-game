@@ -46,7 +46,7 @@ window.addEventListener('load', () => { // I don't see the point of this yet
     // }
 
     const game = new Game(canvas)
-    
+    game.init()
     console.log(game)
 
     function animate() {
