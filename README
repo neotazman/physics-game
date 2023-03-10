@@ -9,9 +9,11 @@
 
 3) checkCollision returns an object rather than an array to be cleaner and easier when using the values
 
+4) replaced estimates for player sprite with actual values using sliceOfPi
+
 # Notes
 
-! 3/7/2023 48:28 in the video
+! 3/9/2023 1:16:41 in the video
 
     physics code that i need to figure out
     //NEED TO REMEMBER THE NEXT FOUR LINES
