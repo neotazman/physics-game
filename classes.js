@@ -10,9 +10,18 @@ class Player {
         this.speedY = 0
         this.dx = 0
         this.dy = 0
-        this.speedModifier = 15
+        this.speedModifier = 5
+        this.spriteWidth = 255
+        this.spriteHeight = 255
+        // i currently don't understand why these need to be set as different properties
+        this.width = this.spriteWidth
+        this.height = this.spriteHeight
+        this.spriteX
+        this.spriteY
+        this.image = document.getElementById('bull')
     }
     draw(context) {
+        context.drawImage(this.image, 0, 0, this.spriteWidth, this.spriteHeight, this.spriteX, this.spriteY, this.width, this.height)
         context.beginPath()
         context.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2)
         // .save() and .restore() are if i want to change a state's settings for what's between them and have it not affect the rest of the code
@@ -41,12 +50,25 @@ class Player {
 
         this.collisionX += this.speedX * this.speedModifier
         this.collisionY += this.speedY * this.speedModifier
+        this.spriteX = this.collisionX - this.width * 0.5
+        this.spriteY = this.collisionY - this.height * 0.5 - 100
         //collisions with obstacles
         this.game.obstacles.forEach(obstacle => {
-            if(this.game.checkCollision(this, obstacle)) {
-                console.log('collision')
+            /* {
+                didCollide: (distance < sumOfRadii),
+                dx: dx,
+                dy: dy,
+                distance: distance,
+                sumOfRadii: sumOfRadii,
+            } */ // the object returned from checkCollision
+            let {didCollide, dx, dy, distance, sumOfRadii} = this.game.checkCollision(this, obstacle)
+            if(didCollide) {
+                const unit_x = dx / distance // the ratio of the horizontal distance to the actual distance
+                const unit_y = dy / distance // the ratio of the vertical distance to the actual distance
+                // unit x
+                this.collisionX = obstacle.collisionX + (sumOfRadii + 1) * unit_x // sets the player's  new x coordinate to be the obstacle's x coordinate plus the distance 
+                this.collisionY = obstacle.collisionY + (sumOfRadii + 1) * unit_y
             }
-            
         })
     }
 }
@@ -122,7 +144,13 @@ class Game {
         const dy = a.collisionY - b.collisionY
         const distance = Math.hypot(dy, dx)
         const sumOfRadii = a.collisionRadius + b.collisionRadius
-        return (distance < sumOfRadii)
+        return {
+            didCollide: (distance < sumOfRadii),
+            dx: dx,
+            dy: dy,
+            distance: distance,
+            sumOfRadii: sumOfRadii,
+        }
     }
     init() {
         // for(let i = 0; i < this.numberOfObstacles; i++) {

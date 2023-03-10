@@ -7,8 +7,15 @@
 
 2) i put the classes in a separate file
 
-3) i used Math.ceil(Math.random()) to choose number of starting obstacles
+3) checkCollision returns an object rather than an array to be cleaner and easier when using the values
 
 # Notes
 
 ! 3/7/2023 48:28 in the video
+
+    physics code that i need to figure out
+    //NEED TO REMEMBER THE NEXT FOUR LINES
+    const unit_x = dx / distance
+    const unit_y = dy / distance
+    this.collisionX = obstacle.collisionX + (sumOfRadii + 1) * unit_x
+    this.collisionY = obstacle.collisionY + (sumOfRadii + 1) * unit_y
