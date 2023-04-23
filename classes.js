@@ -5,12 +5,12 @@ class Player {
         this.game = game
         this.collisionX = this.game.width * 0.5
         this.collisionY = this.game.height * 0.5
-        this.collisionRadius = 50
+        this.collisionRadius = 30
         this.speedX = 0
         this.speedY = 0
         this.dx = 0
         this.dy = 0
-        this.speedModifier = 5
+        this.speedModifier = 25
         this.spriteWidth = 255
         this.spriteHeight = 255
         this.width = this.spriteWidth
@@ -68,6 +68,12 @@ class Player {
         this.collisionY += this.speedY * this.speedModifier
         this.spriteX = this.collisionX - this.width * 0.5
         this.spriteY = this.collisionY - this.height * 0.5 - 100
+        //horizontal boundaries
+        if(this.collisionX < this.collisionRadius) this.collisionX = this.collisionRadius // the left side of the canvas is zero, but the left side should be added to the collision radius
+        else if(this.collisionX > this.game.width - this.collisionRadius) this.collisionX = this.game.width - this.collisionRadius
+        //vertical boundaries
+        if(this.collisionY < this.game.topMargin + this.collisionRadius) this.collisionY = this.game.topMargin + this.collisionRadius // again the top is zero so it can just be taken out
+        else if(this.collisionY > this.game.height - this.collisionRadius) this.collisionY = this.game.height - this.collisionRadius
         //collisions with obstacles
         this.game.obstacles.forEach(obstacle => {
             /* {
@@ -81,7 +87,6 @@ class Player {
             if(didCollide) {
                 const unit_x = dx / distance // the ratio of the horizontal distance to the actual distance
                 const unit_y = dy / distance // the ratio of the vertical distance to the actual distance
-                // unit x
                 this.collisionX = obstacle.collisionX + (sumOfRadii + 1) * unit_x // sets the player's  new x coordinate to be the obstacle's x coordinate plus the distance 
                 this.collisionY = obstacle.collisionY + (sumOfRadii + 1) * unit_y
             }
