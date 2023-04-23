@@ -10,9 +10,9 @@ class Player {
         this.speedY = 0
         this.dx = 0
         this.dy = 0
-        this.speedModifier = 25
+        this.speedModifier = 5
         this.spriteWidth = 255
-        this.spriteHeight = 255
+        this.spriteHeight = 256
         this.width = this.spriteWidth
         this.height = this.spriteHeight
         this.spriteX
@@ -134,6 +134,9 @@ class Game {
         this.topMargin = 260
         this.debug = true
         this.player = new Player(this) // instantiating the player, later might be useful to put somewhere else instead/in addition to
+        this.fps = 20
+        this.timer = 0
+        this.interval = 1000/this.fps
         this.numberOfObstacles = 10 // Math.ceil(Math.random() * 6)
         this.obstacles = []
         this.mouse = {
@@ -162,10 +165,16 @@ class Game {
             if(e.key === 'd') this.debug = !this.debug
         })
     }
-    render(context) {
-        this.player.draw(context)
-        this.player.update()
-        this.obstacles.forEach(obstacle => obstacle.draw(context))
+    render(context, deltaTime) {
+        if(this.timer > this.interval) {
+            //animate frames
+            context.clearRect(0, 0, this.width, this.height)
+            this.obstacles.forEach(obstacle => obstacle.draw(context))
+            this.player.draw(context)
+            this.player.update()
+            this.timer = 0
+        }
+        this.timer+= deltaTime
     }
     checkCollision(a, b) {
         const dx = a.collisionX - b.collisionX
@@ -198,7 +207,7 @@ class Game {
                     overlap = true
                 }
             })
-            const margin = testObstacle.collisionRadius * 2
+            const margin = testObstacle.collisionRadius * 3
             if(!overlap && testObstacle.spriteX > 0 && testObstacle.spriteX < this.width - testObstacle.width && testObstacle.collisionY > this.topMargin + margin && testObstacle.collisionY < this.height - margin) { // makes sure the obstacles don't overlap or move past the edges of the page
                 this.obstacles.push(testObstacle)
             }
