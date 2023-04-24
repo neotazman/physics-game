@@ -21,3 +21,5 @@
     const unit_y = dy / distance
     this.collisionX = obstacle.collisionX + (sumOfRadii + 1) * unit_x
     this.collisionY = obstacle.collisionY + (sumOfRadii + 1) * unit_y
+
+the controls respond to events within the canvas, so when the mouse is moved out of the canvas while the mouse isPressed, and you release the mouse, it won't change the isPressed property until you click inside the canvas -- I tried to add the event listener onto the window, which fixed teh isPressed bug, but when you press outside the canvas it screws up the mouse position; that way might work down the line if i set an if statement inside the window event listener to check if it's inside the canvas

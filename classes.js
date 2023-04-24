@@ -10,7 +10,7 @@ class Player {
         this.speedY = 0
         this.dx = 0
         this.dy = 0
-        this.speedModifier = 5
+        this.speedModifier = 25
         this.spriteWidth = 255
         this.spriteHeight = 256
         this.width = this.spriteWidth
@@ -145,17 +145,17 @@ class Game {
             isPressed: false,
         }
         // the overlay is changed in the css file to make these work more reliably
-        canvas.addEventListener('mousedown', (e) => { 
-            this.mouse.x = e.offsetX
-            this.mouse.y = e.offsetY
+        window.addEventListener('mousedown', (e) => { 
+            this.mouse.x = e.offsetX || this.player.collisionX
+            this.mouse.y = e.offsetY || this.player.collisionY
             this.mouse.isPressed = true
         })
-        canvas.addEventListener('mouseup', (e) => { 
-            this.mouse.x = e.offsetX
-            this.mouse.y = e.offsetY
+        window.addEventListener('mouseup', (e) => { 
+            this.mouse.x = e.offsetX || this.player.collisionX
+            this.mouse.y = e.offsetY || this.player.collisionY
             this.mouse.isPressed = false
         })
-        canvas.addEventListener('mousemove', (e) => { 
+        window.addEventListener('mousemove', (e) => { 
             if(this.mouse.isPressed) {
                 this.mouse.x = e.offsetX
                 this.mouse.y = e.offsetY                
