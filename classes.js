@@ -10,7 +10,7 @@ class Player {
         this.speedY = 0
         this.dx = 0
         this.dy = 0
-        this.speedModifier = 25
+        this.speedModifier = 5
         this.spriteWidth = 255
         this.spriteHeight = 256
         this.width = this.spriteWidth
@@ -134,7 +134,7 @@ class Game {
         this.topMargin = 260
         this.debug = true
         this.player = new Player(this) // instantiating the player, later might be useful to put somewhere else instead/in addition to
-        this.fps = 20
+        this.fps = 70
         this.timer = 0
         this.interval = 1000/this.fps
         this.numberOfObstacles = 10 // Math.ceil(Math.random() * 6)
@@ -145,17 +145,17 @@ class Game {
             isPressed: false,
         }
         // the overlay is changed in the css file to make these work more reliably
-        window.addEventListener('mousedown', (e) => { 
-            this.mouse.x = e.offsetX || this.player.collisionX
-            this.mouse.y = e.offsetY || this.player.collisionY
+        canvas.addEventListener('mousedown', (e) => { 
+            this.mouse.x = e.offsetX
+            this.mouse.y = e.offsetY
             this.mouse.isPressed = true
         })
-        window.addEventListener('mouseup', (e) => { 
-            this.mouse.x = e.offsetX || this.player.collisionX
-            this.mouse.y = e.offsetY || this.player.collisionY
+        canvas.addEventListener('mouseup', (e) => { 
+            this.mouse.x = e.offsetX
+            this.mouse.y = e.offsetY
             this.mouse.isPressed = false
         })
-        window.addEventListener('mousemove', (e) => { 
+        canvas.addEventListener('mousemove', (e) => { 
             if(this.mouse.isPressed) {
                 this.mouse.x = e.offsetX
                 this.mouse.y = e.offsetY                
