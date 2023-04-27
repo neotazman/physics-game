@@ -126,6 +126,36 @@ class Obstacle {
     }
 }
 
+class Egg {
+    constructor(game) {
+        this.game = game
+        this.collisionRadius = 40
+        this.margin = this.collisionRadius * 2
+        this.collisionX = this.margin + (Math.random() * (this.game.width - this.margin * 2))
+        this.collisionY = this.game.topMargin + (Math.random() * (this.game.height - this.game.topMargin - this.margin))
+        this.image = document.getElementById('egg')
+        this.spriteWidth = 110
+        this.spriteHeight = 135
+        this.width = this.spriteWidth
+        this.height = this.spriteHeight
+        this.spriteX = this.collisionX - this.width * 0.5
+        this.spriteY = this.collisionY - this.height * 0.5 - 30
+    }
+    draw(context) {
+        context.drawImage(this.image, this.spriteX, this.spriteY)
+        if(this.game.debug) {
+            context.beginPath()
+            context.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2)
+            // .save() and .restore() are if i want to change a state's settings for what's between them and have it not affect the rest of the code
+            context.save() // context.save() creates a snapshot of the current canvas state
+            context.globalAlpha = 0.5
+            context.fill()
+            context.restore() // restores what was saved
+            context.stroke()
+        }
+    }
+}
+
 class Game {
     constructor(canvas) {
         this.canvas = canvas
@@ -137,8 +167,12 @@ class Game {
         this.fps = 70
         this.timer = 0
         this.interval = 1000/this.fps
+        this.eggTimer = 0
+        this.eggInterval = 500
         this.numberOfObstacles = 10 // Math.ceil(Math.random() * 6)
+        this.maxEggs = 10
         this.obstacles = []
+        this.eggs = []
         this.mouse = {
             x: this.canvas.width * 0.5,
             y: this.canvas.height * 0.5,
@@ -170,11 +204,20 @@ class Game {
             //animate frames
             context.clearRect(0, 0, this.width, this.height)
             this.obstacles.forEach(obstacle => obstacle.draw(context))
+            this.eggs.forEach(egg => egg.draw(context))
             this.player.draw(context)
             this.player.update()
             this.timer = 0
         }
         this.timer+= deltaTime
+        // add the eggs periodically
+        if(this.eggTimer > this.eggInterval && this.eggs.length < this.maxEggs) {
+            this.addEgg()
+            this.eggTimer = 0
+            console.log(this.eggs)
+        } else {
+            this.eggTimer+= deltaTime
+        }
     }
     checkCollision(a, b) {
         const dx = a.collisionX - b.collisionX
@@ -188,6 +231,9 @@ class Game {
             distance: distance,
             sumOfRadii: sumOfRadii,
         }
+    }
+    addEgg() {
+        this.eggs.push(new Egg(this))
     }
     init() {
         // for(let i = 0; i < this.numberOfObstacles; i++) {
