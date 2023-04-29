@@ -154,6 +154,18 @@ class Egg {
             context.stroke()
         }
     }
+    update() {
+        let collisionObjects = [this.game.player, ...this.game.obstacles]
+        collisionObjects.forEach(object => {
+            let {didCollide, distance, sumOfRadii, dx, dy} = this.game.checkCollision(this, object)
+            if(didCollide) {
+                const unit_x = dx / distance
+                const unit_y = dy / distance
+                this.collisionX = object.collisionX + (sumOfRadii + 1) * unit_x
+                this.collisionY = object.collisionY + (sumOfRadii + 1) * unit_y
+            }
+        })
+    }
 }
 
 class Game {
@@ -204,7 +216,10 @@ class Game {
             //animate frames
             context.clearRect(0, 0, this.width, this.height)
             this.obstacles.forEach(obstacle => obstacle.draw(context))
-            this.eggs.forEach(egg => egg.draw(context))
+            this.eggs.forEach(egg => {
+                egg.draw(context)
+                egg.update()
+            })
             this.player.draw(context)
             this.player.update()
             this.timer = 0
