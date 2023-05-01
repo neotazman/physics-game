@@ -20,6 +20,6 @@
     pointer-events: none; /* prevent the overlay from interfering with mouse clicks on the canvas */
 }
 
-#obstacles, #bull, #egg {
+#obstacles, #bull, #egg, #toad {
     display: none;
 }

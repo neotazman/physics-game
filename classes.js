@@ -160,6 +160,55 @@ class Egg {
     update() {
         this.spriteX = this.collisionX - this.width * 0.5
         this.spriteY = this.collisionY - this.height * 0.5 - 30
+        let collisionObjects = [this.game.player, ...this.game.obstacles, ...this.game.enemies]
+        collisionObjects.forEach(object => {
+            let {didCollide, distance, sumOfRadii, dx, dy} = this.game.checkCollision(this, object)
+            if(didCollide) {
+                const unit_x = dx / distance
+                const unit_y = dy / distance
+                this.collisionX = object.collisionX + (sumOfRadii + 1) * unit_x
+                this.collisionY = object.collisionY + (sumOfRadii + 1) * unit_y
+            }
+        })
+    }
+}
+
+class Enemy {
+    constructor(game) {
+        this.game = game
+        this.collisionRadius = 30
+        this.speedX = Math.random() * 3 + 5
+        this.image = document.getElementById('toad')
+        this.spriteWidth = 140
+        this.spriteHeight = 260
+        this.width = this.spriteWidth
+        this.height = this.spriteHeight
+        this.collisionX = this.game.width + this.width + Math.random() * this.game.width * 0.5
+        this.collisionY = this.game.topMargin + Math.random() * (this.game.height - this.game.topMargin)
+        this.spriteX
+        this.spriteY
+    }
+    draw(context) {
+        context.drawImage(this.image, this.spriteX, this.spriteY)
+        if(this.game.debug) {
+            context.beginPath()
+            context.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2)
+            // .save() and .restore() are if i want to change a state's settings for what's between them and have it not affect the rest of the code
+            context.save() // context.save() creates a snapshot of the current canvas state
+            context.globalAlpha = 0.5
+            context.fill()
+            context.restore() // restores what was saved
+            context.stroke()
+        }
+    }
+    update() {
+        this.spriteX = this.collisionX - this.width * 0.5
+        this.spriteY = this.collisionY - this.height + 40
+        this.collisionX-= this.speedX
+        if(this.collisionX + this.width < 0) {
+            this.collisionX = this.game.width + this.width + Math.random() * this.game.width * 0.5
+            this.collisionY = this.game.topMargin + Math.random() * (this.game.height - this.game.topMargin)
+        }
         let collisionObjects = [this.game.player, ...this.game.obstacles]
         collisionObjects.forEach(object => {
             let {didCollide, distance, sumOfRadii, dx, dy} = this.game.checkCollision(this, object)
@@ -170,6 +219,14 @@ class Egg {
                 this.collisionY = object.collisionY + (sumOfRadii + 1) * unit_y
             }
         })
+    }
+}
+
+class Larva {
+    constructor(game, x, y) {
+        this.game = game
+        this.collisionX = x
+        this.collisionY = y
     }
 }
 
@@ -185,11 +242,13 @@ class Game {
         this.timer = 0
         this.interval = 1000/this.fps
         this.eggTimer = 0
-        this.eggInterval = 1000
+        this.eggInterval = 500
         this.numberOfObstacles = 10 // Math.ceil(Math.random() * 6)
         this.maxEggs = 20
+        this.numberOfEnemies = 3
         this.obstacles = []
         this.eggs = []
+        this.enemies = []
         this.gameObjects = []
         this.mouse = {
             x: this.canvas.width * 0.5,
@@ -221,7 +280,7 @@ class Game {
         if(this.timer > this.interval) {
             //animate frames
             context.clearRect(0, 0, this.width, this.height)
-            this.gameObjects = [...this.eggs, ...this.obstacles, this.player]
+            this.gameObjects = [...this.eggs, ...this.obstacles, this.player, ...this.enemies]
             // sort by vertical position
             this.gameObjects.sort((a, b) => {
                 return a.collisionY - b.collisionY
@@ -257,10 +316,16 @@ class Game {
     addEgg() {
         this.eggs.push(new Egg(this))
     }
+    addEnemy() {
+        this.enemies.push(new Enemy(this))
+    }
     init() {
         // for(let i = 0; i < this.numberOfObstacles; i++) {
         //     this.obstacles.push(new Obstacle(this))
         // }
+        for(let i = 0; i < this.numberOfEnemies; i++) {
+            this.addEnemy()
+        }
         let attempts = 0
         while(this.obstacles.length < this.numberOfObstacles && attempts < 200) {
             let testObstacle = new Obstacle(this)
