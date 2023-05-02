@@ -143,6 +143,9 @@ class Egg {
         this.height = this.spriteHeight
         this.spriteX
         this.spriteY
+        this.hatchTimer = 0
+        this.hatchInterval = 3000
+        this.markedForDeletion = false
     }
     draw(context) {
         context.drawImage(this.image, this.spriteX, this.spriteY)
@@ -155,11 +158,14 @@ class Egg {
             context.fill()
             context.restore() // restores what was saved
             context.stroke()
+            const displayTimer = (this.hatchTimer / 1000).toFixed(0)
+            context.fillText(displayTimer, this.collisionX, this.collisionY - this.collisionRadius * 2.5)
         }
     }
-    update() {
+    update(deltaTime) {
         this.spriteX = this.collisionX - this.width * 0.5
         this.spriteY = this.collisionY - this.height * 0.5 - 30
+        //collisions
         let collisionObjects = [this.game.player, ...this.game.obstacles, ...this.game.enemies]
         collisionObjects.forEach(object => {
             let {didCollide, distance, sumOfRadii, dx, dy} = this.game.checkCollision(this, object)
@@ -170,6 +176,14 @@ class Egg {
                 this.collisionY = object.collisionY + (sumOfRadii + 1) * unit_y
             }
         })
+        //hatching
+        if(this.hatchTimer > this.hatchInterval) {
+            this.game.hatchlings.push(new Larva(this.game, this.collisionX, this.collisionY))
+            this.markedForDeletion = true
+            this.game.removeGameObject()
+        } else {
+            this.hatchTimer+= deltaTime
+        }
     }
 }
 
@@ -227,6 +241,38 @@ class Larva {
         this.game = game
         this.collisionX = x
         this.collisionY = y
+        this.collisionRadius = 30
+        this.image = document.getElementById('larva')
+        this.spriteWidth = 150
+        this.spriteHeight = 150
+        this.width = this.spriteWidth
+        this.height = this.spriteHeight
+        this.spriteX
+        this.spriteY
+        this.speedX = 1 + Math.random()
+    }
+    draw(context) {
+        context.drawImage(this.image, 0, 0, this.spriteWidth,this.spriteHeight, this.spriteX, this.spriteY, this.width, this.height)
+        if(this.game.debug) {
+            context.beginPath()
+            context.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2)
+            // .save() and .restore() are if i want to change a state's settings for what's between them and have it not affect the rest of the code
+            context.save() // context.save() creates a snapshot of the current canvas state
+            context.globalAlpha = 0.5
+            context.fill()
+            context.restore() // restores what was saved
+            context.stroke()
+        }
+    }
+    update() {
+        this.collisionY-= this.speedX
+        this.spriteX = this.collisionX - this.width * 0.5
+        this.spriteY = this.collisionY - this.height * 0.5 - 50
+        // move to safety
+        if(this.collisionY < this.game.topMargin) {
+            this.markedForDeletion = true
+            this.game.removeGameObject()
+        }
     }
 }
 
@@ -249,6 +295,7 @@ class Game {
         this.obstacles = []
         this.eggs = []
         this.enemies = []
+        this.hatchlings = []
         this.gameObjects = []
         this.mouse = {
             x: this.canvas.width * 0.5,
@@ -280,14 +327,14 @@ class Game {
         if(this.timer > this.interval) {
             //animate frames
             context.clearRect(0, 0, this.width, this.height)
-            this.gameObjects = [...this.eggs, ...this.obstacles, this.player, ...this.enemies]
+            this.gameObjects = [...this.eggs, ...this.obstacles, this.player, ...this.enemies, ...this.hatchlings]
             // sort by vertical position
             this.gameObjects.sort((a, b) => {
                 return a.collisionY - b.collisionY
             })
             this.gameObjects.forEach(object => {
                 object.draw(context)
-                object.update()
+                object.update(deltaTime)
             })
             this.timer = 0
         }
@@ -318,6 +365,10 @@ class Game {
     }
     addEnemy() {
         this.enemies.push(new Enemy(this))
+    }
+    removeGameObject() {
+        this.eggs = this.eggs.filter(object => !object.markedForDeletion)
+        this.hatchlings = this.hatchlings.filter(object => !object.markedForDeletion)
     }
     init() {
         // for(let i = 0; i < this.numberOfObstacles; i++) {

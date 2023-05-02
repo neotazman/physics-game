@@ -18,6 +18,8 @@ window.addEventListener('load', () => { // I don't see the point of this yet
     ctx.fillStyle = 'white'
     ctx.lineWidth = 3
     ctx.strokeStyle = 'white'
+    ctx.font = '40px Helvetica'
+    ctx.textAlign = 'center'
 
     // class Player { // i put the classes in a separate file 
     //     constructor(game) {
