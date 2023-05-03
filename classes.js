@@ -372,6 +372,15 @@ class Game {
         } else {
             this.eggTimer+= deltaTime
         }
+        // draw score
+        context.save()
+        context.textAlign = 'left'
+        context.fillText(`Score: ${this.score}`, 25, 50)
+        if(this.debug) {
+            context.fillText(`Lost Hatclings: ${this.lostHatchlings}`, 25, 100)
+
+        }
+        context.restore()
     }
     checkCollision(a, b) {
         const dx = a.collisionX - b.collisionX
