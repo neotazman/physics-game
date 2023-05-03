@@ -223,6 +223,7 @@ class Enemy {
             this.collisionX = this.game.width + this.width + Math.random() * this.game.width * 0.5
             this.collisionY = this.game.topMargin + Math.random() * (this.game.height - this.game.topMargin)
         }
+        // collisions
         let collisionObjects = [this.game.player, ...this.game.obstacles]
         collisionObjects.forEach(object => {
             let {didCollide, distance, sumOfRadii, dx, dy} = this.game.checkCollision(this, object)
@@ -250,9 +251,11 @@ class Larva {
         this.spriteX
         this.spriteY
         this.speedX = 1 + Math.random()
+        this.frameX = 0
+        this.frameY = Math.floor(Math.random() * 2)
     }
     draw(context) {
-        context.drawImage(this.image, 0, 0, this.spriteWidth,this.spriteHeight, this.spriteX, this.spriteY, this.width, this.height)
+        context.drawImage(this.image, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth,this.spriteHeight, this.spriteX, this.spriteY, this.width, this.height)
         if(this.game.debug) {
             context.beginPath()
             context.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2)
@@ -273,6 +276,24 @@ class Larva {
             this.markedForDeletion = true
             this.game.removeGameObject()
         }
+        // collisions with objects
+        let collisionObjects = [this.game.player, ...this.game.obstacles]
+        collisionObjects.forEach(object => {
+            let {didCollide, distance, sumOfRadii, dx, dy} = this.game.checkCollision(this, object)
+            if(didCollide) {
+                const unit_x = dx / distance
+                const unit_y = dy / distance
+                this.collisionX = object.collisionX + (sumOfRadii + 1) * unit_x
+                this.collisionY = object.collisionY + (sumOfRadii + 1) * unit_y
+            }
+        })
+        // collisions with enemies
+        this.game.enemies.forEach(enemy => {
+            if(this.game.checkCollision(this, enemy)[0]) {
+                this.markedForDeletion = true
+                
+            }
+        })
     }
 }
 
