@@ -275,6 +275,7 @@ class Larva {
         if(this.collisionY < this.game.topMargin) {
             this.markedForDeletion = true
             this.game.removeGameObject()
+            this.game.score++
         }
         // collisions with objects
         let collisionObjects = [this.game.player, ...this.game.obstacles]
@@ -289,9 +290,11 @@ class Larva {
         })
         // collisions with enemies
         this.game.enemies.forEach(enemy => {
-            if(this.game.checkCollision(this, enemy)[0]) {
+            if(this.game.checkCollision(this, enemy).didCollide) { // refering only to didCollide
                 this.markedForDeletion = true
-                
+                this.game.removeGameObject()
+                this.game.lostHatchlings++
+                console.log(this.game.score, this.game.lostHatchlings)
             }
         })
     }
@@ -318,6 +321,8 @@ class Game {
         this.enemies = []
         this.hatchlings = []
         this.gameObjects = []
+        this.score = 0
+        this.lostHatchlings = 0
         this.mouse = {
             x: this.canvas.width * 0.5,
             y: this.canvas.height * 0.5,
