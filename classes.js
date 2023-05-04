@@ -294,10 +294,32 @@ class Larva {
                 this.markedForDeletion = true
                 this.game.removeGameObject()
                 this.game.lostHatchlings++
-                console.log(this.game.score, this.game.lostHatchlings)
             }
         })
     }
+}
+
+class Particle {
+    constructor(game, x, y, color) {
+        this.game = game
+        this.collisionX = x
+        this.collisionY = y
+        this.color = color
+        this.radius = Math.floor(Math.random() * 10 + 5)
+        this.speedX = Math.random() * 6 - 3
+        this.speedY = Math.random() * 2 + 0.5
+        this.angle = 0
+        this.va = Math.random() * 0.1 * 0.01
+        this.markedForDeletion = false
+    }
+}
+
+class Firefly extends Particle {
+    
+}
+
+class Spark extends Particle {
+
 }
 
 class Game {
