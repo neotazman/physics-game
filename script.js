@@ -1,12 +1,12 @@
 // this was made using a tutorial: https://www.youtube.com/watch?v=U34l-Xz5ynU&t=342s
 
-// using exact pixels doesn't work well with zooming in, so i'm using a variable that both the canvas and the overlay will be set to
+// i'm using a variable that both the canvas and the overlay will be set to
 // might change to percentage in css
 let canvasHeight = 720
 let canvasWidth = canvasHeight * (1280 / 720)
 
 
-window.addEventListener('load', () => { // I don't see the point of this yet
+window.addEventListener('load', () => { 
     const canvas = document.getElementById("canvas1")
     const ctx = canvas.getContext("2d")
     const overlay = document.getElementById("overlay")
@@ -20,33 +20,6 @@ window.addEventListener('load', () => { // I don't see the point of this yet
     ctx.strokeStyle = 'black'
     ctx.font = '40px Helvetica'
     ctx.textAlign = 'center'
-
-    // class Player { // i put the classes in a separate file 
-    //     constructor(game) {
-    //         this.game = game
-    //         this.collisionX = this.game.width * 0.5
-    //         this.collisionY = this.game.height * 0.5
-    //         this.collisionRadius = 50
-    //     }
-    //     draw(context) {
-    //         context.beginPath()
-    //         context.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2)
-    //         context.fill()
-    //     }
-    // }
-
-    // class Game {
-    //     constructor(canvas) {
-    //         this.canvas = canvas
-    //         this.width = this.canvas.width
-    //         this.height = this.canvas.height
-    //         this.player = new Player(this) // instantiating the player, later might be useful to put somewhere else instead/in addition to
-    //     }
-    //     render(context) {
-    //         this.player.draw(context)
-    //     }
-    // }
-    
 
     const game = new Game(canvas)
     game.init()

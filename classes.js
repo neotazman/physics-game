@@ -354,7 +354,7 @@ class Game {
         this.width = this.canvas.width
         this.height = this.canvas.height
         this.topMargin = 260
-        this.debug = true
+        this.debug = false
         this.player = new Player(this) // instantiating the player, later might be useful to put somewhere else instead/in addition to
         this.fps = 70
         this.timer = 0
