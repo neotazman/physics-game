@@ -276,6 +276,13 @@ class Larva {
             this.markedForDeletion = true
             this.game.removeGameObject()
             this.game.score++
+            // pick a random color from selections below
+            const pickColor = ['red', 'yellow', 'green', 'orange', 'pink']
+            const randomColor = pickColor[Math.floor(Math.random() * pickColor.length)]
+            // put a random number of fireflies bewtween 1 and 4
+            for(let i = 0; i < Math.ceil(Math.random() * 4); i++) {
+                this.game.particles.push(new Firefly(this.game, this.collisionX, this.collisionY, randomColor))
+            } 
         }
         // collisions with objects
         let collisionObjects = [this.game.player, ...this.game.obstacles]
@@ -312,14 +319,33 @@ class Particle {
         this.va = Math.random() * 0.1 * 0.01
         this.markedForDeletion = false
     }
+    draw(context) {
+        context.save()
+        context.fillStyle = this.color
+        context.beginPath()
+        context.arc(this.collisionX, this.collisionY, this.radius, 0, Math.PI * 2)
+        context.fill()
+        context.stroke()
+        context.restore()
+    }
 }
 
 class Firefly extends Particle {
-    
+    update() {
+        this.angle+= this.va
+        this.collisionX+= this.speedX
+        this.collisionY-= this.speedY
+        if(this.collisionY < 0 - this.radius) {
+            this.markedForDeletion = true
+            this.game.removeGameObject()
+        }
+    }
 }
 
 class Spark extends Particle {
+    update() {
 
+    }
 }
 
 class Game {
@@ -342,6 +368,7 @@ class Game {
         this.eggs = []
         this.enemies = []
         this.hatchlings = []
+        this.particles= []
         this.gameObjects = []
         this.score = 0
         this.lostHatchlings = 0
@@ -375,7 +402,7 @@ class Game {
         if(this.timer > this.interval) {
             //animate frames
             context.clearRect(0, 0, this.width, this.height)
-            this.gameObjects = [...this.eggs, ...this.obstacles, this.player, ...this.enemies, ...this.hatchlings]
+            this.gameObjects = [...this.eggs, ...this.obstacles, this.player, ...this.enemies, ...this.hatchlings, ...this.particles]
             // sort by vertical position
             this.gameObjects.sort((a, b) => {
                 return a.collisionY - b.collisionY
@@ -426,6 +453,7 @@ class Game {
     removeGameObject() {
         this.eggs = this.eggs.filter(object => !object.markedForDeletion)
         this.hatchlings = this.hatchlings.filter(object => !object.markedForDeletion)
+        this.particles = this.particles.filter(object => !object.markedForDeletion)
     }
     init() {
         // for(let i = 0; i < this.numberOfObstacles; i++) {
