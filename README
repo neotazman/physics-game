@@ -13,6 +13,8 @@
 
 5) instead of just red as the color of particles, i created an array of colors to pick from randomly as well as a random number of particles between 1 and 4
 
+6) debug mode starts off
+
 # Notes
 
 ! 3/9/2023 1:16:41 in the video

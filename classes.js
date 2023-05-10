@@ -55,6 +55,12 @@ class Player {
         else if(angle < (sliceOfPi * 3)) this.frameY = 3
         else if(angle < (sliceOfPi * 5)) this.frameY = 4
         else if(angle < (sliceOfPi * 7)) this.frameY = 5
+        // the X frames
+        // if(this.frameX < 20) {
+        //     this.frameX++
+        // } else {
+        //     this.frameX = 0
+        // }
         const distance = Math.hypot(this.dy, this.dx)
         if(distance > this.speedModifier) { // so the player doesn't keep shaking when it hits the clicked spot
             this.speedX = this.dx / distance || 0
@@ -144,7 +150,7 @@ class Egg {
         this.spriteX
         this.spriteY
         this.hatchTimer = 0
-        this.hatchInterval = 3000
+        this.hatchInterval = 7000
         this.markedForDeletion = false
     }
     draw(context) {
@@ -177,7 +183,7 @@ class Egg {
             }
         })
         //hatching
-        if(this.hatchTimer > this.hatchInterval) {
+        if(this.hatchTimer > this.hatchInterval || this.collisionY < this.game.topMargin) {
             this.game.hatchlings.push(new Larva(this.game, this.collisionX, this.collisionY))
             this.markedForDeletion = true
             this.game.removeGameObject()
@@ -277,10 +283,10 @@ class Larva {
             this.game.removeGameObject()
             this.game.score++
             // pick a random color from selections below
-            const pickColor = ['red', 'yellow', 'green', 'orange', 'pink']
-            const randomColor = pickColor[Math.floor(Math.random() * pickColor.length)]
+            const pickColor = ['red', 'green', 'orange', 'blue']
+            const randomColor = pickColor[Math.floor(Math.random() * pickColor.length)] // putting this outside of the loop makes sure all random fireflies are the same color when they were spawned from the same larva -- each firefly being a random color looked weird to me
             // put a random number of fireflies bewtween 1 and 4
-            for(let i = 0; i < Math.ceil(Math.random() * 4); i++) {
+            for(let i = 0; i < Math.ceil(Math.random() * 4) + 2; i++) {
                 this.game.particles.push(new Firefly(this.game, this.collisionX, this.collisionY, randomColor))
             } 
         }
@@ -301,6 +307,9 @@ class Larva {
                 this.markedForDeletion = true
                 this.game.removeGameObject()
                 this.game.lostHatchlings++
+                for(let i = 0; i < Math.ceil(Math.random() * 4); i++) {
+                    this.game.particles.push(new Spark(this.game, this.collisionX, this.collisionY, 'yellow'))
+                } 
             }
         })
     }
@@ -316,7 +325,7 @@ class Particle {
         this.speedX = Math.random() * 6 - 3
         this.speedY = Math.random() * 2 + 0.5
         this.angle = 0
-        this.va = Math.random() * 0.1 * 0.01
+        this.va = Math.random() * 0.1 + 0.01
         this.markedForDeletion = false
     }
     draw(context) {
@@ -333,7 +342,7 @@ class Particle {
 class Firefly extends Particle {
     update() {
         this.angle+= this.va
-        this.collisionX+= this.speedX
+        this.collisionX+= Math.cos(this.angle) * this.speedX
         this.collisionY-= this.speedY
         if(this.collisionY < 0 - this.radius) {
             this.markedForDeletion = true
@@ -344,7 +353,14 @@ class Firefly extends Particle {
 
 class Spark extends Particle {
     update() {
-
+        this.angle+= this.va * 0.5
+        this.collisionX-= Math.cos(this.angle) * this.speedX
+        this.collisionY-= Math.sin(this.angle) * this.speedY
+        if(this.radius > 0.1) this.radius-= 0.05
+        if(this.radius < 0.2) {
+            this.markedForDeletion = true
+            this.game.removeGameObject()
+        }
     }
 }
 
