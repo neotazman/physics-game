@@ -15,6 +15,10 @@
 
 6) debug mode starts off
 
+7) lostHatchlings contribute to the score -- only changed at the score display
+
+8) enemies push each other away -- i added a ternary into the checkCollision method on the game object so if both game objects are the same, it would always return false; then in the Enemy update method, i spread the enemies array into the collisionObjects array for the checkCollision 
+
 # Notes
 
 ! 3/9/2023 1:16:41 in the video

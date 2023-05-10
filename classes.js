@@ -198,7 +198,7 @@ class Enemy {
         this.game = game
         this.collisionRadius = 30
         this.speedX = Math.random() * 3 + 5
-        this.image = document.getElementById('toad')
+        this.image = document.getElementById('toads')
         this.spriteWidth = 140
         this.spriteHeight = 260
         this.width = this.spriteWidth
@@ -207,9 +207,11 @@ class Enemy {
         this.collisionY = this.game.topMargin + Math.random() * (this.game.height - this.game.topMargin)
         this.spriteX
         this.spriteY
+        this.frameX = 0
+        this.frameY = Math.floor(Math.random() * 4)
     }
     draw(context) {
-        context.drawImage(this.image, this.spriteX, this.spriteY)
+        context.drawImage(this.image, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, this.spriteX, this.spriteY, this.width, this.height)
         if(this.game.debug) {
             context.beginPath()
             context.arc(this.collisionX, this.collisionY, this.collisionRadius, 0, Math.PI * 2)
@@ -228,9 +230,10 @@ class Enemy {
         if(this.collisionX + this.width < 0) {
             this.collisionX = this.game.width + this.width + Math.random() * this.game.width * 0.5
             this.collisionY = this.game.topMargin + Math.random() * (this.game.height - this.game.topMargin)
+            this.frameY = Math.floor(Math.random() * 4)
         }
         // collisions
-        let collisionObjects = [this.game.player, ...this.game.obstacles]
+        let collisionObjects = [this.game.player, ...this.game.obstacles, ...this.game.enemies]
         collisionObjects.forEach(object => {
             let {didCollide, distance, sumOfRadii, dx, dy} = this.game.checkCollision(this, object)
             if(didCollide) {
@@ -378,8 +381,8 @@ class Game {
         this.eggTimer = 0
         this.eggInterval = 500
         this.numberOfObstacles = 10 // Math.ceil(Math.random() * 6)
-        this.maxEggs = 20
-        this.numberOfEnemies = 3
+        this.maxEggs = 5
+        this.numberOfEnemies = 4
         this.obstacles = []
         this.eggs = []
         this.enemies = []
@@ -440,7 +443,7 @@ class Game {
         // draw score
         context.save()
         context.textAlign = 'left'
-        context.fillText(`Score: ${this.score}`, 25, 50)
+        context.fillText(`Score: ${this.score * 1000 - this.lostHatchlings * 100 * 6}`, 25, 50) 
         if(this.debug) {
             context.fillText(`Lost Hatclings: ${this.lostHatchlings}`, 25, 100)
 
@@ -453,7 +456,7 @@ class Game {
         const distance = Math.hypot(dy, dx)
         const sumOfRadii = a.collisionRadius + b.collisionRadius
         return {
-            didCollide: (distance < sumOfRadii),
+            didCollide: a === b ? false : (distance < sumOfRadii),
             dx: dx,
             dy: dy,
             distance: distance,
