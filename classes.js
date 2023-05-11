@@ -21,6 +21,13 @@ class Player {
         this.frameY = 0
         this.image = document.getElementById('bull')
     }
+    restart() {
+        this.collisionX = this.game.width * 0.5
+        this.collisionY = this.game.height * 0.5
+        this.spriteX = this.collisionX - this.width * 0.5
+        this.spriteY = this.collisionY - this.height * 0.5 - 100
+
+    }
     draw(context) {
         context.drawImage(this.image, this.frameX * this.spriteWidth, this.frameY * this.spriteWidth, this.spriteWidth, this.spriteHeight, this.spriteX, this.spriteY, this.width, this.height)
         if(this.game.debug) {
@@ -172,7 +179,7 @@ class Egg {
         this.spriteX = this.collisionX - this.width * 0.5
         this.spriteY = this.collisionY - this.height * 0.5 - 30
         //collisions
-        let collisionObjects = [this.game.player, ...this.game.obstacles, ...this.game.enemies]
+        let collisionObjects = [this.game.player, ...this.game.obstacles, ...this.game.enemies, ...this.game.hatchlings]
         collisionObjects.forEach(object => {
             let {didCollide, distance, sumOfRadii, dx, dy} = this.game.checkCollision(this, object)
             if(didCollide) {
@@ -259,7 +266,7 @@ class Larva {
         this.height = this.spriteHeight
         this.spriteX
         this.spriteY
-        this.speedX = 1 + Math.random()
+        this.speedX = 1 + Math.random() * 2
         this.frameX = 0
         this.frameY = Math.floor(Math.random() * 2)
     }
@@ -279,7 +286,7 @@ class Larva {
     update() {
         this.collisionY-= this.speedX
         this.spriteX = this.collisionX - this.width * 0.5
-        this.spriteY = this.collisionY - this.height * 0.5 - 50
+        this.spriteY = this.collisionY - this.height * 0.5 - 40
         // move to safety
         if(this.collisionY < this.game.topMargin) {
             this.markedForDeletion = true
@@ -390,7 +397,7 @@ class Game {
         this.particles= []
         this.gameObjects = []
         this.score = 0
-        this.winningScore = 1
+        this.winningScore = 15
         this.gameOver = false
         this.lostHatchlings = 0
         this.mouse = {
@@ -417,6 +424,7 @@ class Game {
         })
         window.addEventListener('keydown', (e) => {
             if(e.key === 'd') this.debug = !this.debug
+            else if(e.key === 'r') this.restart()
         })
     }
     render(context, deltaTime) {
@@ -465,7 +473,7 @@ class Game {
             context.shadowColor = 'black'
             let message1
             let message2
-            if(this.lostHatchlings <= 5) {
+            if(this.lostHatchlings <= this.winningScore / 2) {
                 // win
                 message1 = 'You Win!!!!!!!!'
                 message2 = 'Can\'t touch this!!!'
@@ -505,6 +513,23 @@ class Game {
         this.eggs = this.eggs.filter(object => !object.markedForDeletion)
         this.hatchlings = this.hatchlings.filter(object => !object.markedForDeletion)
         this.particles = this.particles.filter(object => !object.markedForDeletion)
+    }
+    restart() {
+        this.player.restart()
+        this.obstacles = []
+        this.eggs = []
+        this.enemies = []
+        this.hatchlings = []
+        this.particles= []
+        this.mouse = {
+            x: this.canvas.width * 0.5,
+            y: this.canvas.height * 0.5,
+            isPressed: false,
+        }
+        this.score = 0
+        this.lostHatchlings = 0
+        this.gameOver = false
+        this.init()
     }
     init() {
         // for(let i = 0; i < this.numberOfObstacles; i++) {
