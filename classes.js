@@ -227,13 +227,13 @@ class Enemy {
         this.spriteX = this.collisionX - this.width * 0.5
         this.spriteY = this.collisionY - this.height + 40
         this.collisionX-= this.speedX
-        if(this.collisionX + this.width < 0) {
+        if(this.spriteX + this.width < 0 && !this.game.gameOver) {
             this.collisionX = this.game.width + this.width + Math.random() * this.game.width * 0.5
             this.collisionY = this.game.topMargin + Math.random() * (this.game.height - this.game.topMargin)
             this.frameY = Math.floor(Math.random() * 4)
         }
         // collisions
-        let collisionObjects = [this.game.player, ...this.game.obstacles, ...this.game.enemies]
+        let collisionObjects = [this.game.player, ...this.game.obstacles, ...this.game.enemies] // this.game.enemies only works with the ternary in the didCollide result; if I change that code I MUST CHANGE THIS CODE 
         collisionObjects.forEach(object => {
             let {didCollide, distance, sumOfRadii, dx, dy} = this.game.checkCollision(this, object)
             if(didCollide) {
@@ -284,9 +284,9 @@ class Larva {
         if(this.collisionY < this.game.topMargin) {
             this.markedForDeletion = true
             this.game.removeGameObject()
-            this.game.score++
+            if(!this.game.gameOver) this.game.score++
             // pick a random color from selections below
-            const pickColor = ['red', 'green', 'orange', 'blue']
+            const pickColor = ['red']
             const randomColor = pickColor[Math.floor(Math.random() * pickColor.length)] // putting this outside of the loop makes sure all random fireflies are the same color when they were spawned from the same larva -- each firefly being a random color looked weird to me
             // put a random number of fireflies bewtween 1 and 4
             for(let i = 0; i < Math.ceil(Math.random() * 4) + 2; i++) {
@@ -306,7 +306,7 @@ class Larva {
         })
         // collisions with enemies
         this.game.enemies.forEach(enemy => {
-            if(this.game.checkCollision(this, enemy).didCollide) { // refering only to didCollide
+            if(this.game.checkCollision(this, enemy).didCollide && !this.game.gameOver) { // refering only to didCollide
                 this.markedForDeletion = true
                 this.game.removeGameObject()
                 this.game.lostHatchlings++
@@ -390,6 +390,8 @@ class Game {
         this.particles= []
         this.gameObjects = []
         this.score = 0
+        this.winningScore = 1
+        this.gameOver = false
         this.lostHatchlings = 0
         this.mouse = {
             x: this.canvas.width * 0.5,
@@ -434,7 +436,7 @@ class Game {
         }
         this.timer+= deltaTime
         // add the eggs periodically
-        if(this.eggTimer > this.eggInterval && this.eggs.length < this.maxEggs) {
+        if(this.eggTimer > this.eggInterval && this.eggs.length < this.maxEggs && !this.gameOver) {
             this.addEgg()
             this.eggTimer = 0
         } else {
@@ -449,6 +451,36 @@ class Game {
 
         }
         context.restore()
+
+        // win/lose message
+        if(this.score >= this.winningScore) {
+            this.gameOver = true
+            context.save()
+            context.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            context.fillRect(0, 0, this.width, this.height)
+            context.fillStyle = 'rgba(255, 255, 255, 0.6)'
+            context.textAlign = 'center'
+            context.shadowOffsetX = 4
+            context.shadowOffsetY = 4
+            context.shadowColor = 'black'
+            let message1
+            let message2
+            if(this.lostHatchlings <= 5) {
+                // win
+                message1 = 'You Win!!!!!!!!'
+                message2 = 'Can\'t touch this!!!'
+            } else {
+                // lose
+                message1 = 'OH NOOOOO!!!!!!!!'
+                message2 = `You lost ${this.lostHatchlings} hatchlings!!!`
+            }
+            context.font = '130px Bangers'
+            context.fillText(message1, this.width * 0.5, this.height * 0.5 -20)
+            context.font = '40px Bangers'
+            context.fillText(message2, this.width * 0.5, this.height * 0.5 + 30)
+            context.fillText(`Final Score ${this.score * 1000 - this.lostHatchlings * 100 * 6}. Press "R" to restart the game.`, this.width * 0.5, this.height * 0.5 + 80)
+            context.restore()
+        }
     }
     checkCollision(a, b) {
         const dx = a.collisionX - b.collisionX
@@ -456,7 +488,7 @@ class Game {
         const distance = Math.hypot(dy, dx)
         const sumOfRadii = a.collisionRadius + b.collisionRadius
         return {
-            didCollide: a === b ? false : (distance < sumOfRadii),
+            didCollide: a === b ? false : (distance < sumOfRadii), // if a and b are the same object, it will always return false
             dx: dx,
             dy: dy,
             distance: distance,

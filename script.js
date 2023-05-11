@@ -18,7 +18,7 @@ window.addEventListener('load', () => {
     ctx.fillStyle = 'white'
     ctx.lineWidth = 3
     ctx.strokeStyle = 'black'
-    ctx.font = '40px Helvetica'
+    ctx.font = '40px Bangers'
     ctx.textAlign = 'center'
 
     const game = new Game(canvas)

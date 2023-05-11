@@ -11,7 +11,7 @@
 
 4) replaced estimates for player sprite with actual values using sliceOfPi
 
-5) instead of just red as the color of particles, i created an array of colors to pick from randomly as well as a random number of particles between 1 and 4
+5) instead of just red as the color of particles, i created an array of colors to pick from randomly as well as a random number of particles between 1 and 4 -- edit: the randomize function is still there but the only color is red
 
 6) debug mode starts off
 
