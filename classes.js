@@ -273,7 +273,7 @@ class Explosion {
         this.yFrames = 3
         this.frameX = 0
         this.frameY = 0
-        this.frameInterval = 10
+        this.frameInterval = this.game.fps * 6
         this.exactFrame = 0
         this.spriteWidth = this.image.width / this.xFrames
         this.spriteHeight = this.image.height / this.yFrames
@@ -284,23 +284,23 @@ class Explosion {
         this.markedForDeletion = false
     }
     draw(context) {
-        context.drawImage(this.image, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteX, this.spriteY, this.width, this.height)
+        context.drawImage(this.image, this.width, this.height)
     }
     update(deltaTime) {
         // this.spriteX = this.collisionX - this.width * 0.5
         // this.spriteY = this.collisionY - this.height * 0.5
-        this.exactFrame+= deltaTime
+        this.exactFrame++
         if(this.exactFrame >= this.frameInterval) {
             this.exactFrame = 0
             if(this.frameX < this.xFrames) {
-                this.frameX++
+                // this.frameX++
             } else {
                 this.frameX = 0
                 if(this.frameY >= this.yFrames) {
                     this.markedForDeletion = true
                     this.game.removeGameObject()
                 } else {
-                    this.frameY++ 
+                    // this.frameY++ 
                 }
             }
         }
@@ -572,6 +572,11 @@ class Game {
         this.hatchlings = this.hatchlings.filter(object => !object.markedForDeletion)
         this.particles = this.particles.filter(object => !object.markedForDeletion)
         this.enemies = this.enemies.filter(object => !object.markedForDeletion)
+        if(this.enemies.length === 0) {
+            for(let i = 0; i < this.numberOfEnemies; i++) {
+                this.addEnemy()
+            }
+        }
     }
     restart() {
         this.player.restart()
