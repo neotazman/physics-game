@@ -10,7 +10,7 @@ class Player {
         this.speedY = 0
         this.dx = 0
         this.dy = 0
-        this.speedModifier = 5
+        this.speedModifier = 10
         this.spriteWidth = 255
         this.spriteHeight = 256
         this.width = this.spriteWidth
@@ -216,6 +216,9 @@ class Enemy {
         this.spriteY
         this.frameX = 0
         this.frameY = Math.floor(Math.random() * 4)
+        this.hits = 0
+        this.maxHits = 1
+        this.markedForDeletion = false
     }
     draw(context) {
         context.drawImage(this.image, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, this.spriteX, this.spriteY, this.width, this.height)
@@ -250,6 +253,57 @@ class Enemy {
                 this.collisionY = object.collisionY + (sumOfRadii + 1) * unit_y
             }
         })
+        if(this.hits >= this.maxHits) {
+            this.markedForDeletion = true
+            this.game.killedEnemies++
+            console.log(this.game.killedEnemies)
+            this.game.explosions.push(new Explosion(this.game, this.collisionX, this.collisionY))
+            this.game.removeGameObject()
+        }
+    }
+}
+
+class Explosion {
+    constructor(game, x, y) {
+        this.game = game
+        this.collisionX = x
+        this.collisionY = y
+        this.image = document.getElementById('explosion')
+        this.xFrames = 4
+        this.yFrames = 3
+        this.frameX = 0
+        this.frameY = 0
+        this.frameInterval = 10
+        this.exactFrame = 0
+        this.spriteWidth = this.image.width / this.xFrames
+        this.spriteHeight = this.image.height / this.yFrames
+        this.width = this.spriteWidth
+        this.height = this.spriteHeight
+        this.spriteX = this.collisionX - this.width * 0.5
+        this.spriteY = this.collisionY - this.height * 0.5
+        this.markedForDeletion = false
+    }
+    draw(context) {
+        context.drawImage(this.image, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteX, this.spriteY, this.width, this.height)
+    }
+    update(deltaTime) {
+        // this.spriteX = this.collisionX - this.width * 0.5
+        // this.spriteY = this.collisionY - this.height * 0.5
+        this.exactFrame+= deltaTime
+        if(this.exactFrame >= this.frameInterval) {
+            this.exactFrame = 0
+            if(this.frameX < this.xFrames) {
+                this.frameX++
+            } else {
+                this.frameX = 0
+                if(this.frameY >= this.yFrames) {
+                    this.markedForDeletion = true
+                    this.game.removeGameObject()
+                } else {
+                    this.frameY++ 
+                }
+            }
+        }
     }
 }
 
@@ -315,6 +369,8 @@ class Larva {
         this.game.enemies.forEach(enemy => {
             if(this.game.checkCollision(this, enemy).didCollide && !this.game.gameOver) { // refering only to didCollide
                 this.markedForDeletion = true
+                enemy.hits++ // larva can hit enemys to destroy them
+                console.log(enemy)
                 this.game.removeGameObject()
                 this.game.lostHatchlings++
                 for(let i = 0; i < Math.ceil(Math.random() * 4); i++) {
@@ -390,11 +446,13 @@ class Game {
         this.numberOfObstacles = 10 // Math.ceil(Math.random() * 6)
         this.maxEggs = 5
         this.numberOfEnemies = 4
+        this.killedEnemies = 0
         this.obstacles = []
         this.eggs = []
         this.enemies = []
         this.hatchlings = []
         this.particles= []
+        this.explosions = []
         this.gameObjects = []
         this.score = 0
         this.winningScore = 15
@@ -431,7 +489,7 @@ class Game {
         if(this.timer > this.interval) {
             //animate frames
             context.clearRect(0, 0, this.width, this.height)
-            this.gameObjects = [...this.eggs, ...this.obstacles, this.player, ...this.enemies, ...this.hatchlings, ...this.particles]
+            this.gameObjects = [...this.eggs, ...this.obstacles, this.player, ...this.enemies, ...this.hatchlings, ...this.particles, ...this.explosions]
             // sort by vertical position
             this.gameObjects.sort((a, b) => {
                 return a.collisionY - b.collisionY
@@ -461,7 +519,7 @@ class Game {
         context.restore()
 
         // win/lose message
-        if(this.score >= this.winningScore) {
+        if(this.score >= this.winningScore && !this.debug) { // the game won't end in debug mode
             this.gameOver = true
             context.save()
             context.fillStyle = 'rgba(0, 0, 0, 0.5)';
@@ -509,10 +567,11 @@ class Game {
     addEnemy() {
         this.enemies.push(new Enemy(this))
     }
-    removeGameObject() {
+    removeGameObject() { // when this is called it removes all game objects so you don't need it to fire multiple times from the same event
         this.eggs = this.eggs.filter(object => !object.markedForDeletion)
         this.hatchlings = this.hatchlings.filter(object => !object.markedForDeletion)
         this.particles = this.particles.filter(object => !object.markedForDeletion)
+        this.enemies = this.enemies.filter(object => !object.markedForDeletion)
     }
     restart() {
         this.player.restart()

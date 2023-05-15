@@ -14,10 +14,20 @@
 5) instead of just red as the color of particles, i created an array of colors to pick from randomly as well as a random number of particles between 1 and 4 -- edit: the randomize function is still there but the only color is red
 
 6) debug mode starts off
+    a) the game won't end in debug mode
 
 7) lostHatchlings contribute to the score -- only changed at the score display
 
 8) enemies push each other away -- i added a ternary into the checkCollision method on the game object so if both game objects are the same, it would always return false; then in the Enemy update method, i spread the enemies array into the collisionObjects array for the checkCollision 
+
+
+### My own ideas
+
+1)Larva have Abilities
+    a) Larva can hit enemies to destroy them
+
+
+
 
 # Notes
 
