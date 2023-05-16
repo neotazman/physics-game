@@ -273,7 +273,7 @@ class Explosion {
         this.yFrames = 3
         this.frameX = 0
         this.frameY = 0
-        this.frameInterval = this.game.fps * 6
+        this.frameInterval = 4
         this.exactFrame = 0
         this.spriteWidth = this.image.width / this.xFrames
         this.spriteHeight = this.image.height / this.yFrames
@@ -284,23 +284,23 @@ class Explosion {
         this.markedForDeletion = false
     }
     draw(context) {
-        context.drawImage(this.image, this.width, this.height)
+        context.drawImage(this.image, this.frameX * this.spriteWidth, this.frameY * this.spriteHeight, this.spriteWidth, this.spriteHeight, this.spriteX, this.spriteY, this.width, this.height)
     }
-    update(deltaTime) {
+    update(deltaTime) { // the draw function only fucks up when i try to animate the sprite
         // this.spriteX = this.collisionX - this.width * 0.5
         // this.spriteY = this.collisionY - this.height * 0.5
         this.exactFrame++
         if(this.exactFrame >= this.frameInterval) {
             this.exactFrame = 0
             if(this.frameX < this.xFrames) {
-                // this.frameX++
+                this.frameX++
             } else {
                 this.frameX = 0
                 if(this.frameY >= this.yFrames) {
                     this.markedForDeletion = true
                     this.game.removeGameObject()
                 } else {
-                    // this.frameY++ 
+                    this.frameY++ 
                 }
             }
         }
