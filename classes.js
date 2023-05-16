@@ -145,7 +145,7 @@ class Obstacle {
 class Egg {
     constructor(game) {
         this.game = game
-        this.collisionRadius = 40
+        this.collisionRadius = 50
         this.margin = this.collisionRadius * 2
         this.collisionX = this.margin + (Math.random() * (this.game.width - this.margin * 2))
         this.collisionY = this.game.topMargin + (Math.random() * (this.game.height - this.game.topMargin - this.margin))
