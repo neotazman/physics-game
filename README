@@ -1,5 +1,8 @@
 # This was made using a tutorial: https://www.youtube.com/watch?v=U34l-Xz5ynU&t=342s
 
+# Other Assets I used
+    https://mixkit.co/free-sound-effects/explosion/ -- explosion sound
+
 # Things I changed
 
  1) i made variables for the canvas size so they would reference each other to be the same dimensions -- i don't think this is gonna matter anymore except for making the overlay and the canvas the same size

@@ -281,6 +281,7 @@ class Explosion {
         this.height = this.spriteHeight
         this.spriteX = this.collisionX - this.width * 0.5
         this.spriteY = this.collisionY - this.height * 0.5
+        this.audioPlayed = false
         this.markedForDeletion = false
     }
     draw(context) {
@@ -289,6 +290,11 @@ class Explosion {
     update(deltaTime) { // the draw function only fucks up when i try to animate the sprite
         // this.spriteX = this.collisionX - this.width * 0.5
         // this.spriteY = this.collisionY - this.height * 0.5
+        if(!this.audioPlayed) {
+            let audio = new Audio("./all_project_sounds/mixkit-arcade-game-explosion-2759.wav")
+            audio.play()
+            this.audioPlayed = true
+        }
         this.exactFrame++
         if(this.exactFrame >= this.frameInterval) {
             this.exactFrame = 0
@@ -511,9 +517,10 @@ class Game {
         // draw score
         context.save()
         context.textAlign = 'left'
-        context.fillText(`Score: ${this.score * 1000 - this.lostHatchlings * 100 * 6}`, 25, 50) 
+        context.fillText(`Score: ${this.score * 1000 - this.lostHatchlings * 100 * 6 + this.killedEnemies * 100 * 5}`, 25, 50) 
         if(this.debug) {
             context.fillText(`Lost Hatclings: ${this.lostHatchlings}`, 25, 100)
+            context.fillText(`Enemies Killed: ${this.killedEnemies}`, 25, 150)
 
         }
         context.restore()
