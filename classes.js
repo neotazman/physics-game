@@ -17,8 +17,12 @@ class Player {
         this.height = this.spriteHeight
         this.spriteX
         this.spriteY
+        this.xFrames = 4
+        this.yFrames = 4
         this.frameX = 0
         this.frameY = 0
+        this.frameInterval = 4
+        this.exactFrame = 0
         this.image = document.getElementById('bull')
     }
     restart() {
@@ -268,9 +272,9 @@ class Explosion {
         this.game = game
         this.collisionX = x
         this.collisionY = y
-        this.image = document.getElementById('explosion')
+        this.image = document.getElementById('new_explosion')
         this.xFrames = 4
-        this.yFrames = 3
+        this.yFrames = 4
         this.frameX = 0
         this.frameY = 0
         this.frameInterval = 4
@@ -280,7 +284,7 @@ class Explosion {
         this.width = this.spriteWidth
         this.height = this.spriteHeight
         this.spriteX = this.collisionX - this.width * 0.5
-        this.spriteY = this.collisionY - this.height * 0.5
+        this.spriteY = this.collisionY - this.height * 0.5 - 80
         this.audioPlayed = false
         this.markedForDeletion = false
     }
@@ -351,7 +355,11 @@ class Larva {
         if(this.collisionY < this.game.topMargin) {
             this.markedForDeletion = true
             this.game.removeGameObject()
-            if(!this.game.gameOver) this.game.score++
+            if(!this.game.gameOver) {
+                this.game.score++
+                let audio = new Audio("./all_project_sounds/mixkit-retro-game-score-212.wav")
+                audio.play()
+            } 
             // pick a random color from selections below
             const pickColor = ['red']
             const randomColor = pickColor[Math.floor(Math.random() * pickColor.length)] // putting this outside of the loop makes sure all random fireflies are the same color when they were spawned from the same larva -- each firefly being a random color looked weird to me
@@ -376,6 +384,8 @@ class Larva {
             if(this.game.checkCollision(this, enemy).didCollide && !this.game.gameOver) { // refering only to didCollide
                 this.markedForDeletion = true
                 enemy.hits++ // larva can hit enemys to destroy them
+                let audio = new Audio("./all_project_sounds/mixkit-air-whistle-punch-2048.wav")
+                audio.play()
                 console.log(enemy)
                 this.game.removeGameObject()
                 this.game.lostHatchlings++
@@ -442,7 +452,7 @@ class Game {
         this.width = this.canvas.width
         this.height = this.canvas.height
         this.topMargin = 260
-        this.debug = false
+        this.debug = true
         this.player = new Player(this) // instantiating the player, later might be useful to put somewhere else instead/in addition to
         this.fps = 70
         this.timer = 0
@@ -463,6 +473,7 @@ class Game {
         this.score = 0
         this.winningScore = 15
         this.gameOver = false
+        this.gameEnded = false
         this.lostHatchlings = 0
         this.mouse = {
             x: this.canvas.width * 0.5,
@@ -542,10 +553,20 @@ class Game {
                 // win
                 message1 = 'You Win!!!!!!!!'
                 message2 = 'Can\'t touch this!!!'
+                if(!this.gameEnded) {
+                    let audio = new Audio("./all_project_sounds/mixkit-ethereal-fairy-win-sound-2019.wav")
+                    audio.play()
+                    this.gameEnded = true
+                }
             } else {
                 // lose
                 message1 = 'OH NOOOOO!!!!!!!!'
                 message2 = `You lost ${this.lostHatchlings} hatchlings!!!`
+                if(!this.gameEnded) {
+                    let audio = new Audio("./all_project_sounds/mixkit-sci-fi-game-over-1951.wav")
+                    audio.play()
+                    this.gameEnded = true
+                }
             }
             context.font = '130px Bangers'
             context.fillText(message1, this.width * 0.5, this.height * 0.5 -20)
