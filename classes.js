@@ -222,7 +222,7 @@ class Enemy {
         this.frameX = 0
         this.frameY = Math.floor(Math.random() * 4)
         this.hits = 0
-        this.maxHits = 5
+        this.maxHits = 3
         this.markedForDeletion = false
     }
     draw(context) {
