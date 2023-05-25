@@ -17,8 +17,13 @@ class Player {
         this.height = this.spriteHeight
         this.spriteX
         this.spriteY
+        // 5/16/2023 below is for the animation, but no animation functions have been added yet, it's just the values used for animation
+        this.xFrames = 4
+        this.yFrames = 4
         this.frameX = 0
         this.frameY = 0
+        this.frameInterval = 4
+        this.exactFrame = 0
         this.image = document.getElementById('bull')
     }
     restart() {
@@ -217,7 +222,7 @@ class Enemy {
         this.frameX = 0
         this.frameY = Math.floor(Math.random() * 4)
         this.hits = 0
-        this.maxHits = 1
+        this.maxHits = 3
         this.markedForDeletion = false
     }
     draw(context) {
@@ -256,7 +261,6 @@ class Enemy {
         if(this.hits >= this.maxHits) {
             this.markedForDeletion = true
             this.game.killedEnemies++
-            console.log(this.game.killedEnemies)
             this.game.explosions.push(new Explosion(this.game, this.collisionX, this.collisionY))
             this.game.removeGameObject()
         }
@@ -268,9 +272,9 @@ class Explosion {
         this.game = game
         this.collisionX = x
         this.collisionY = y
-        this.image = document.getElementById('explosion')
+        this.image = document.getElementById('new_explosion')
         this.xFrames = 4
-        this.yFrames = 3
+        this.yFrames = 4
         this.frameX = 0
         this.frameY = 0
         this.frameInterval = 4
@@ -280,7 +284,7 @@ class Explosion {
         this.width = this.spriteWidth
         this.height = this.spriteHeight
         this.spriteX = this.collisionX - this.width * 0.5
-        this.spriteY = this.collisionY - this.height * 0.5
+        this.spriteY = this.collisionY - this.height * 0.5 - 80
         this.audioPlayed = false
         this.markedForDeletion = false
     }
@@ -351,7 +355,11 @@ class Larva {
         if(this.collisionY < this.game.topMargin) {
             this.markedForDeletion = true
             this.game.removeGameObject()
-            if(!this.game.gameOver) this.game.score++
+            if(!this.game.gameOver) {
+                this.game.score++
+                let audio = new Audio("./all_project_sounds/mixkit-retro-game-score-212.wav")
+                audio.play()
+            } 
             // pick a random color from selections below
             const pickColor = ['red']
             const randomColor = pickColor[Math.floor(Math.random() * pickColor.length)] // putting this outside of the loop makes sure all random fireflies are the same color when they were spawned from the same larva -- each firefly being a random color looked weird to me
@@ -376,6 +384,8 @@ class Larva {
             if(this.game.checkCollision(this, enemy).didCollide && !this.game.gameOver) { // refering only to didCollide
                 this.markedForDeletion = true
                 enemy.hits++ // larva can hit enemys to destroy them
+                let audio = new Audio("./all_project_sounds/mixkit-air-whistle-punch-2048.wav")
+                audio.play()
                 console.log(enemy)
                 this.game.removeGameObject()
                 this.game.lostHatchlings++
@@ -461,8 +471,9 @@ class Game {
         this.explosions = []
         this.gameObjects = []
         this.score = 0
-        this.winningScore = 15
+        this.winningScore = 25
         this.gameOver = false
+        this.gameEnded = false
         this.lostHatchlings = 0
         this.mouse = {
             x: this.canvas.width * 0.5,
@@ -523,6 +534,10 @@ class Game {
             context.fillText(`Enemies Killed: ${this.killedEnemies}`, 25, 150)
 
         }
+        // the instructions
+        context.fillText(`Click on board to move to that location`, 300, 50)
+        context.fillText('Push eggs and larva to the forest or push enemies away', 300, 100)
+        context.fillText('Enemies will eat larva and get hurt in the process', 300, 150)
         context.restore()
 
         // win/lose message
@@ -542,10 +557,20 @@ class Game {
                 // win
                 message1 = 'You Win!!!!!!!!'
                 message2 = 'Can\'t touch this!!!'
+                if(!this.gameEnded) {
+                    let audio = new Audio("./all_project_sounds/mixkit-ethereal-fairy-win-sound-2019.wav")
+                    audio.play()
+                    this.gameEnded = true
+                }
             } else {
                 // lose
                 message1 = 'OH NOOOOO!!!!!!!!'
                 message2 = `You lost ${this.lostHatchlings} hatchlings!!!`
+                if(!this.gameEnded) {
+                    let audio = new Audio("./all_project_sounds/mixkit-sci-fi-game-over-1951.wav")
+                    audio.play()
+                    this.gameEnded = true
+                }
             }
             context.font = '130px Bangers'
             context.fillText(message1, this.width * 0.5, this.height * 0.5 -20)
