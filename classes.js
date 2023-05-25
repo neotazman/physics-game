@@ -17,6 +17,7 @@ class Player {
         this.height = this.spriteHeight
         this.spriteX
         this.spriteY
+        // 5/16/2023 below is for the animation, but no animation functions have been added yet, it's just the values used for animation
         this.xFrames = 4
         this.yFrames = 4
         this.frameX = 0
@@ -221,7 +222,7 @@ class Enemy {
         this.frameX = 0
         this.frameY = Math.floor(Math.random() * 4)
         this.hits = 0
-        this.maxHits = 1
+        this.maxHits = 5
         this.markedForDeletion = false
     }
     draw(context) {
@@ -260,7 +261,6 @@ class Enemy {
         if(this.hits >= this.maxHits) {
             this.markedForDeletion = true
             this.game.killedEnemies++
-            console.log(this.game.killedEnemies)
             this.game.explosions.push(new Explosion(this.game, this.collisionX, this.collisionY))
             this.game.removeGameObject()
         }
@@ -452,7 +452,7 @@ class Game {
         this.width = this.canvas.width
         this.height = this.canvas.height
         this.topMargin = 260
-        this.debug = true
+        this.debug = false
         this.player = new Player(this) // instantiating the player, later might be useful to put somewhere else instead/in addition to
         this.fps = 70
         this.timer = 0
@@ -471,7 +471,7 @@ class Game {
         this.explosions = []
         this.gameObjects = []
         this.score = 0
-        this.winningScore = 15
+        this.winningScore = 25
         this.gameOver = false
         this.gameEnded = false
         this.lostHatchlings = 0
@@ -534,6 +534,10 @@ class Game {
             context.fillText(`Enemies Killed: ${this.killedEnemies}`, 25, 150)
 
         }
+        // the instructions
+        context.fillText(`Click on board to move to that location`, 300, 50)
+        context.fillText('Push eggs and larva to the forest or push enemies away', 300, 100)
+        context.fillText('Enemies will eat larva and get hurt in the process', 300, 150)
         context.restore()
 
         // win/lose message
